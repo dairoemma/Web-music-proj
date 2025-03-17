@@ -27,11 +27,11 @@ def insert_user(user_details):
     if name and username and password and email:
         
         if get_user(username=username):
-            hashed_password = generate_password_hash(password)
-            users_collection.insert_one({"name": name, "username": username, "password": hashed_password, "email": email})
-            return jsonify({"status": "success", "message": "user added successfully"}), 201
-        else:
-            return jsonify({"status": "error", "message": "Username does not exist"}), 400  
+           return jsonify({"status": "error", "message": "Username already exist"}), 400 
+        else: 
+             hashed_password = generate_password_hash(password)
+             users_collection.insert_one({"name": name, "username": username, "password": hashed_password, "email": email})
+             return jsonify({"status": "success", "message": "user added successfully"}), 201
     else:
         return jsonify({"status": "error", "message": "All fields are required"}), 400
     
