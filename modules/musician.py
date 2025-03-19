@@ -67,7 +67,7 @@ def insert_musician(musician_details):
         return jsonify({"status": "error", "message": "All fields are required"}), 400
     
 
-def delete_user(musician_details):
+def delete_musician(musician_details):
     username = musician_details['username']
     password = musician_details['password']
     
