@@ -31,12 +31,12 @@ def insert_musician(musician_details):
 
     if username and password and email and music_genre and songs:
         if get_musician(username=username):
-            return jsonify({"status": "error", "message": "Username already exist"}), 400 
+            return {"status": "error", "message": "Username already exist"}, 400 
         
         result = get_file__path(songs=songs)
          
         if result['failed_song'] == None and result['processed_song'] == None:
-            return jsonify({"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}), 400
+            return {"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}, 400
         
         elif result['failed_song'] and result['processed_song']:
             for failed in result['failed_song']:
@@ -56,15 +56,15 @@ def insert_musician(musician_details):
             })
             
         if failed_songs:
-            return jsonify({ "status": "success", "message": "Added musician but some songs failed to upload", "failed_songs": failed_songs }), 201
+            return { "status": "success", "message": "Added musician but some songs failed to upload", "failed_songs": failed_songs }, 201
             
         else:
 
-            return jsonify({"status": "success", "message": "musician added successfully. All songs uploaded successfully"}), 201
+            return {"status": "success", "message": "musician added successfully. All songs uploaded successfully"}, 201
           
     else:
 
-        return jsonify({"status": "error", "message": "All fields are required"}), 400
+        return {"status": "error", "message": "All fields are required"}, 400
     
 
 def delete_musician(musician_details):
@@ -78,15 +78,15 @@ def delete_musician(musician_details):
             
             if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password):
                 musicians_collection.delete_one({"musician_name": username})
-                return jsonify({"status": "success", "message": "musician deleted successfully"}), 200
+                return {"status": "success", "message": "musician deleted successfully"}, 200
             else:
-                return jsonify({"status": "error", "message": "Incorrect username or password"}), 401
+                return {"status": "error", "message": "Incorrect username or password"}, 401
             
         else:
-            return jsonify({"status": "error", "message": "musician does not exist"}), 400    
+            return {"status": "error", "message": "musician does not exist"}, 400    
         
     else:
-        return jsonify({"status": "error", "message": "All fields are required"}), 400
+        return {"status": "error", "message": "All fields are required"}, 400
     
 
 def update_musician(musician_details):
@@ -97,11 +97,11 @@ def update_musician(musician_details):
     if username and field_to_update and field_new_value:
         if get_musician(username=username):
             musicians_collection.update_one({"musician_name": username}, {"$set": {field_to_update: field_new_value}})
-            return jsonify({"status": "success", "message": "musician updated successfully"}), 200
+            return {"status": "success", "message": "musician updated successfully"}, 200
         else:
-            return jsonify({"status": "error", "message": "musician does not exist"}), 400 
+            return {"status": "error", "message": "musician does not exist"}, 400 
     else:
-        return jsonify({"status": "error", "message": "All fields are required"}), 400
+        return {"status": "error", "message": "All fields are required"}, 400
     
 
 def update_music(music_details):
@@ -115,11 +115,11 @@ def update_music(music_details):
                                             {"$set": {"music.$[elem].song_link": new_song_link}}, 
                                             array_filter=[{'elem.song_name': song_name}]
                                             )
-            return jsonify({"status": "success", "message": "music updated successfully"}), 200
+            return {"status": "success", "message": "music updated successfully"}, 200
         else:
-            return jsonify({"status": "error", "message": "musician does not exist"}), 400 
+            return {"status": "error", "message": "musician does not exist"}, 400 
     else:
-        return jsonify({"status": "error", "message": "All fields are required"}), 400
+        return {"status": "error", "message": "All fields are required"}, 400
         
 
 def get_music(username):
@@ -149,7 +149,7 @@ def get_a_music(details):
             return None
         
     else:
-        return jsonify({"status": "error", "message": "All fields are required"}), 400
+        return {"status": "error", "message": "All fields are required"}, 400
 
 
     

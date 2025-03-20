@@ -36,10 +36,7 @@ def insert_user(user_details):
         return {"status": "error", "message": "All fields are required"}, 400
     
 
-def delete_user(user_details):
-    username = user_details['username']
-    password = user_details['password']
-    
+def delete_user(username, password):
     if username and password:
         user_get_detail = get_user(username=username)
 
@@ -55,8 +52,7 @@ def delete_user(user_details):
         return {"status": "error", "message": "All fields are required"}, 400
     
 
-def update_user(user_details):
-    username = user_details['username']
+def update_user(username, user_details):
     field_to_update = user_details['field_to_update']
     field_new_value = user_details['field_new_value']
 
