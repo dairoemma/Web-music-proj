@@ -4,9 +4,10 @@ from modules.user import get_all_user, get_user, insert_user, delete_user, updat
 from modules.musician import get_all_musician, get_musician, get_music, get_a_music
 from helper_function.celery_file import process_payment
 from datetime import datetime
-from helper_function.redis_config import redis_user, redis_user_payment
+from helper_function.redis_config import redis_user_payment
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from helper_function.socket_file import handle_message, handle_leave_room, on_connect
 
 
 user_bp = Blueprint('user', __name__)
@@ -14,7 +15,7 @@ user_bp = Blueprint('user', __name__)
 
 @user_bp.route('/')
 def index():
-    return "Routes is running"
+    return "user routes is running"
 
 
 @user_bp.route('/payment_processed', methods=['POST'])
@@ -95,7 +96,7 @@ def authenticate_user():
     
 
 @user_bp.route('/user_profile', methods=['GET'])
-@jwt_required
+@jwt_required()
 def user_profile():
     user = get_jwt_identity()
 
@@ -107,7 +108,7 @@ def user_profile():
     
     
 @user_bp.route('/search_user', methods=['GET'])
-@jwt_required
+@jwt_required()
 def search_user():
     data = request.json
     user_to_search = data.get('user_to_search')
@@ -127,7 +128,7 @@ def search_user():
 
 
 @user_bp.route('/get_users', methods=['GET'])
-@jwt_required
+@jwt_required()
 def get_user():
     user = get_jwt_identity()
 
@@ -139,7 +140,7 @@ def get_user():
 
 
 @user_bp.route('/search_musician', methods=['GET'])
-@jwt_required
+@jwt_required()
 def search_musician():
     user = get_jwt_identity()
     data = request.json
@@ -159,7 +160,7 @@ def search_musician():
 
 
 @user_bp.route('/get_musicians', methods=['GET'])
-@jwt_required
+@jwt_required()
 def get_musicians():
     user = get_jwt_identity()
 
@@ -171,7 +172,7 @@ def get_musicians():
     
 
 @user_bp.route('/search_music', methods=['GET'])
-@jwt_required
+@jwt_required()
 def search_music():
     data = request.json
     music_details = data.get('music_details')
@@ -191,7 +192,7 @@ def search_music():
 
 
 @user_bp.route('/get_musician_catalogue', methods=['GET'])
-@jwt_required
+@jwt_required()
 def get_musician_catalogue():
     data = request.json
     user = get_jwt_identity()
@@ -211,7 +212,7 @@ def get_musician_catalogue():
     
 
 @user_bp.route('/update_user_info', methods=['PUT'])
-@jwt_required
+@jwt_required()
 def update_user_info():
     user = get_jwt_identity()
     data = request.json
@@ -228,7 +229,7 @@ def update_user_info():
 
 
 @user_bp.route('/delete_user_details', methods=['DELETE'])
-@jwt_required        
+@jwt_required()        
 def delete_user_details():
     user = get_jwt_identity()
     data = request.json
@@ -240,7 +241,61 @@ def delete_user_details():
             return jsonify(response), status_code
         else:
             return jsonify({"status":"error", "message": "All fields are required"}), 400
+        
     else:
         return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
 
+
+@user_bp.route('/join_user_room', methods=['POST'])
+@jwt_required()
+def join_chat_room():
+    user = get_jwt_identity()
+
+    if user:
+        response = on_connect(user, "redis_user")
+
+        if response['status'] == "success":
+            return jsonify(response), 201
+        else:
+            return jsonify(response), 400
+        
+    else:
+        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
+
+
+@user_bp.route('/send_message_user', methods=['POST'])
+@jwt_required()
+def send_message():
+    user = get_jwt_identity()
+    data = request.json
+    room = data.get('room')
+    message = data.get('message')
+
+    if user:
+        response = handle_message(message, room, "user")
+
+        if response['status'] == "success":
+            return jsonify(response), 200
+        else:
+            return jsonify(response), 400
+        
+    else:
+        return jsonify({"status": "error", "message": "Invalid Credentials, Access denied"}), 401
+
+
+@user_bp.route('/leave_room_user', methods=['POST'])
+@jwt_required()
+def delete_chat():
+    user = get_jwt_identity()
+
+    if user:
+        response = handle_leave_room(user, "user")
+
+        if response['status'] == "success":
+            return jsonify(response), 200
+        else:
+            return jsonify(response), 400
+        
+    else:
+        return jsonify({"status": "error", "message": "Invalid Credentials, Access denied"}), 401    
 

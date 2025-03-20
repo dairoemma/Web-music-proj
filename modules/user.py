@@ -28,10 +28,12 @@ def insert_user(user_details):
         
         if get_user(username):
            return {"status": "error", "message": "Username already exist"}, 400 
+        
         else: 
              hashed_password = generate_password_hash(password)
              users_collection.insert_one({"name": name, "username": username, "password": hashed_password, "email": email})
              return {"status": "success", "message": "user added successfully"}, 201
+        
     else:
         return {"status": "error", "message": "All fields are required"}, 400
     
@@ -41,13 +43,16 @@ def delete_user(username, password):
         user_get_detail = get_user(username=username)
 
         if user_get_detail:
+
             if user_get_detail['username'] == username and check_password_hash(user_get_detail['password'], password):
                 users_collection.delete_one({"username":username})
                 return {"status": "success", "message": "user deleted successfully"}, 200
             else:
                 return {"status": "error", "message": "Incorrect username or password"}, 401
+            
         else:
             return {"status": "error", "message": "Username does not exist"}, 400    
+        
     else:
         return {"status": "error", "message": "All fields are required"}, 400
     
@@ -63,6 +68,7 @@ def update_user(username, user_details):
             return {"status": "success", "message": "user updated successfully"}, 200
         else:
             return {"status": "error", "message": "Username does not exist"}, 400 
+        
     else:
         return {"status": "error", "message": "All fields are required"}, 400
     
