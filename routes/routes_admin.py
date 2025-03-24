@@ -4,4 +4,4 @@ from modules.user import get_all_user, get_user, insert_user, delete_user, updat
 from modules.musician import get_all_musician, get_musician, get_music, get_a_music
 from flask import Blueprint, jsonify
 
-admin_bp = Blueprint('user', __name__)
+admin_bp = Blueprint('admin', __name__)
