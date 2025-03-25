@@ -1,6 +1,5 @@
 from modules.database import musicians_collection
 from werkzeug.security import generate_password_hash, check_password_hash
-from external_api.cloudinary_file import upload_music
 from helper_function.utility import get_file__path
 
 
@@ -26,6 +25,7 @@ def insert_musician(musician_details):
     music_genre = musician_details['music_genre'] 
     
     if username and password and email and music_genre:
+        
         if get_musician(username=username):
             return {"status": "error", "message": "musician-name already exist"}, 400 
         else:  
@@ -41,10 +41,7 @@ def insert_musician(musician_details):
         return {"status": "error", "message": "All fields are required"}, 400
     
 
-def delete_musician(musician_details):
-    username = musician_details['username']
-    password = musician_details['password']
-    
+def delete_musician(username, password):
     if username and password:
         musician_get_detail = get_musician(username=username)
 
@@ -62,29 +59,53 @@ def delete_musician(musician_details):
     else:
         return {"status": "error", "message": "All fields are required"}, 400
     
+    
+def delete_music(username, password, song_name):
+    if username and password and song_name:
+        musician_get_detail = get_musician(username=username)
 
-def update_musician(musician_details):
-    username = musician_details['username']
+        if musician_get_detail:
+            
+            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password):
+                musicians_collection.update_one({{"musician_name": username},
+                                                 {"$pull": {"music": {"song_name":song_name }}}
+                                                 })
+                return {"status": "success", "message": "music deleted successfully"}, 200
+            
+            else:
+                return {"status": "error", "message": "Incorrect username or password"}, 401
+            
+        else:
+            return {"status": "error", "message": "musician does not exist"}, 400    
+        
+    else:
+        return {"status": "error", "message": "All fields are required"}, 400
+    
+
+def update_musician(username, musician_details):
     field_to_update = musician_details['field_to_update']
     field_new_value = musician_details['field_new_value']
 
     if username and field_to_update and field_new_value:
+
         if get_musician(username=username):
             musicians_collection.update_one({"musician_name": username}, {"$set": {field_to_update: field_new_value}})
             return {"status": "success", "message": "musician updated successfully"}, 200
         else:
             return {"status": "error", "message": "musician does not exist"}, 400 
+        
     else:
         return {"status": "error", "message": "All fields are required"}, 400
     
     
-def update_music(music_details):
-    username = music_details['username']
+def update_music(username, music_details):
     song_name = music_details['song_name']
     songs = music_details['new_song_link']
     failed_songs = []
+    is_processed = None
 
     if username and song_name and songs:
+
         if get_musician(username=username):
             result = get_file__path(songs=songs) 
 
@@ -102,23 +123,25 @@ def update_music(music_details):
                                             {"$set": {"music.$[elem].song_link": processed['song_link']}}, 
                                             array_filter=[{'elem.song_name': song_name}]
                                             )
+                is_processed  = True
                     
-            if not failed_songs:
+            if is_processed:
                 return {"status": "success", "message": "music updated successfully"}, 201      
         else:
             return {"status": "error", "message": "musician does not exist"}, 400 
+        
     else:
         return {"status": "error", "message": "All fields are required"}, 400
         
 
-def add_music(music_details):       
-    username = music_details['username']
+def add_music(username, music_details):       
     song_name = music_details['song_name']
-    songs = music_details['new_song_link']
+    songs = music_details['song_link']
     processed_songs=[]
     failed_songs = []
 
     if username and song_name and songs:
+
         if get_musician(username=username):
             result = get_file__path(songs=songs) 
 
@@ -141,6 +164,7 @@ def add_music(music_details):
                 return {"status": "success", "message": "musician added successfully"}, 201      
         else:
             return {"status": "error", "message": "musician does not exist"}, 400 
+        
     else:
         return {"status": "error", "message": "All fields are required"}, 400 
 
@@ -153,6 +177,7 @@ def get_music(username):
 
         songs = { song["song_name"]: song["song_link"] for song in music}
         return songs
+    
     else:
         return None
     
@@ -173,12 +198,3 @@ def get_a_music(details):
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400
-
-
-    
-    
-
-           
-        
-     
-    

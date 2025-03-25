@@ -84,7 +84,7 @@ def search_user(unique_name, user_to_search):
         return {"status": "error", "message": "Invalid Credentials, Access denied"}, 401 
 
 
-def get_user(unique_name):
+def get_all_users(unique_name):
     if unique_name:
         users_details = get_all_user()
         return {users_details}, 200

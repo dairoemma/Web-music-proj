@@ -1,7 +1,7 @@
 from flask import request, jsonify,Blueprint
 from helper_function.jwt_initialization import create_token
-from modules.user import get_all_user, get_user, insert_user, delete_user, update_user
-from modules.musician import get_all_musician, get_musician, get_music, get_a_music
+from modules.user import get_user, insert_user, delete_user, update_user
+from helper_function.utility import search_music, search_musician, search_user, get_musician_catalogue, get_all_users, get_musicians
 from helper_function.celery_file import process_payment
 from datetime import datetime
 from helper_function.redis_config import redis_user_payment
@@ -109,86 +109,53 @@ def user_profile():
     
 @user_bp.route('/search_user', methods=['GET'])
 @jwt_required()
-def search_user():
+def search_a_user():
     data = request.json
     user_to_search = data.get('user_to_search')
     user = get_jwt_identity()
 
-    if user:
-        if user_to_search:
-            user_details = get_user(user_to_search)
-            if user_details:
-                return jsonify(user_details), 200
-            else:
-                return jsonify({"status": "error","message": "User not found"}), 404
-        else:
-            return jsonify({"status": "error", "message": "All fieds required"}), 400
-    else:
-        return jsonify({"status": "error", "message": "Invalid Credentials, Access denied"}), 401 
+    response, status_code = search_user(user, user_to_search)
+    return jsonify(response), status_code
 
 
 @user_bp.route('/get_users', methods=['GET'])
 @jwt_required()
-def get_user():
+def get_users():
     user = get_jwt_identity()
 
-    if user:
-        users_details = get_all_user()
-        return jsonify(users_details), 200
-    else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
+    response, status_code = get_all_users(user)
+    return jsonify(response), status_code
 
 
 @user_bp.route('/search_musician', methods=['GET'])
 @jwt_required()
-def search_musician():
+def search_a_musician():
     user = get_jwt_identity()
     data = request.json
-    musician = data.get('musician')
+    musician_name = data.get('musician')
 
-    if user:
-        if musician:
-            musician_details = get_musician(musician)
-            if musician_details:
-                return jsonify(musician_details), 200
-            else:
-                return jsonify({"status": "error", "message": "Musician not found"}), 404
-        else:
-            return jsonify({"status": "error", "message": "All fields are required"}), 400
-    else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401    
+    response, status_code =  search_musician(user, musician_name)
+    return jsonify(response), status_code
 
 
 @user_bp.route('/get_musicians', methods=['GET'])
 @jwt_required()
-def get_musicians():
+def get_all_musicians():
     user = get_jwt_identity()
-
-    if user:
-        musicians_details = get_all_musician()
-        return jsonify(musicians_details), 200
-    else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
     
+    response, status_code = get_musicians(user)
+    return jsonify(response), status_code
+
 
 @user_bp.route('/search_music', methods=['GET'])
 @jwt_required()
-def search_music():
+def search_a_music():
     data = request.json
     music_details = data.get('music_details')
     user = get_jwt_identity()
 
-    if user:
-        if music_details:
-            music = get_a_music(music_details)
-            if music:
-                return jsonify(music), 200
-            else:
-                return jsonify({"status": "error", "message": "Music not found"}), 404
-        else:
-            return jsonify({"status": "error", "message": "All fields are required"}), 400
-    else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401    
+    response, status_code = search_music(user, music_details)
+    return jsonify(response), status_code  
 
 
 @user_bp.route('/get_musician_catalogue', methods=['GET'])
@@ -198,17 +165,8 @@ def get_musician_catalogue():
     user = get_jwt_identity()
     musician_name = data.get('musician_name')
 
-    if user:
-        if musician_name:
-            music_details = get_music(musician_name)
-            if music_details:
-                return jsonify(music_details), 200
-            else:
-                return jsonify({"status": "error", "message": "Musician not found"}), 404
-        else:
-            return jsonify({"status": "error", "message": "All fields are required"}), 400    
-    else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
+    response, status_code = get_musician_catalogue(user, musician_name)
+    return jsonify(response), status_code
     
 
 @user_bp.route('/update_user_info', methods=['PUT'])

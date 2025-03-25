@@ -1,6 +1,6 @@
 from modules.database import users_collection
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import jsonify
+
 
 
 def get_all_user():

@@ -1,5 +1,5 @@
-from flask_jwt_extended import  JWTManager, create_access_token, get_jwt_identity
-from flask import request
+from flask_jwt_extended import  JWTManager, create_access_token
+
 
 
 def initialize_jwt(app):
