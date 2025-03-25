@@ -3,17 +3,17 @@ from config import Config
 from datetime import datetime
 import time
 
-
-def make_celery(app):
-    celery = Celery(
-        app.import_name,
+celery = Celery(
+        __name__,
         backend= Config.CELERY_BACKEND_URL ,
         broker= Config.CELERY_BROKER_URL
     )
+
+def make_celery(app):
     celery.conf.update(app.config)
     return celery
 
-celery = make_celery(None)
+
 
 @celery.task()
 def process_payment(account_name, account_number, cvv, password, user_expiry_date, amount_in_account):
