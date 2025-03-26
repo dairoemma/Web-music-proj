@@ -57,7 +57,7 @@ def admin_profile():
 
 @admin_bp.route('/get_all_admin', methods=['GET'])
 @jwt_required()
-def get_all_musicians():
+def get_all_admins():
     admin = get_jwt_identity()
     
     if admin:
