@@ -1,7 +1,9 @@
 from modules.database import musicians_collection
 from werkzeug.security import generate_password_hash, check_password_hash
-from helper_function.utility import get_file__path
 
+def get_file__path(*args, **kwargs):
+    from helper_function.utility import get_file__path as inner
+    return inner(*args, **kwargs)
 
 def get_all_musician():
     musicians = musicians_collection.find()
