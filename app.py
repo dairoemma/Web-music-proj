@@ -12,8 +12,8 @@ app.config.from_object(Config)
 
 jwt = initialize_jwt(app=app)
 
-for bp in blueprints:
-    app.register_blueprint(bp)
+for bp, prefix in blueprints:
+    app.register_blueprint(bp, url_prefix=prefix)
 
 # celery = make_celery(app)
 
