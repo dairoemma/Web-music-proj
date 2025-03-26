@@ -1,4 +1,4 @@
-from socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from helper_function.redis_config import redis_user, redis_admin, redis_musician
 
 
