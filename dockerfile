@@ -9,4 +9,5 @@ COPY . .
 EXPOSE 5000
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "app.py"]
+RUN pip install gunicorn eventlet
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "app:app", "-b", "0.0.0.0:5000"]

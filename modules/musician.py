@@ -67,9 +67,9 @@ def delete_music(username, password, song_name):
         if musician_get_detail:
             
             if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password):
-                musicians_collection.update_one({{"musician_name": username},
+                musicians_collection.update_one({"musician_name": username},
                                                  {"$pull": {"music": {"song_name":song_name }}}
-                                                 })
+                                                 )
                 return {"status": "success", "message": "music deleted successfully"}, 200
             
             else:
