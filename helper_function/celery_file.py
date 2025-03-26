@@ -1,21 +1,21 @@
-from celery import Celery
-from config import Config
+# from celery import Celery
+# from config import Config
 from datetime import datetime
 import time
 
-celery = Celery(
-        __name__,
-        backend= Config.CELERY_BACKEND_URL ,
-        broker= Config.CELERY_BROKER_URL
-    )
+# celery = Celery(
+#         __name__,
+#         backend= Config.CELERY_BACKEND_URL ,
+#         broker= Config.CELERY_BROKER_URL
+#     )
 
-def make_celery(app):
-    celery.conf.update(app.config)
-    return celery
+# def make_celery(app):
+#     celery.conf.update(app.config)
+#     return celery
 
 
 
-@celery.task()
+# @celery.task()
 def process_payment(account_name, account_number, cvv, password, user_expiry_date, amount_in_account):
     
     try: 

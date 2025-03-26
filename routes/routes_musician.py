@@ -37,43 +37,45 @@ def payment_processed():
     except ValueError:
         return jsonify({"message": "Invalid data format"}), 400
 
-    task = process_payment.apply_async(args=[account_name, account_number, cvv, password, expiry_date, amount_in_account])
-    return jsonify({"message": "payment processing started", "task_id": task.id}), 202
+    # task = process_payment.apply_async(args=[account_name, account_number, cvv, password, expiry_date, amount_in_account])
+    # return jsonify({"message": "payment processing started", "task_id": task.id}), 202
+    result = process_payment(account_name, account_number, cvv, password, expiry_date, amount_in_account)
+    return jsonify(result), 200 
 
 
-@musician_bp.route('/payment_status/<task_id>', methods=['GET'])
-def payment_status(task_id):
+# @musician_bp.route('/payment_status/<task_id>', methods=['GET'])
+# def payment_status(task_id):
 
-    task = process_payment.AsyncResult(task_id)
+#     task = process_payment.AsyncResult(task_id)
 
-    if task.state == "PENDING":
-        return jsonify({"STATUS": "processing payment"}), 202
+#     if task.state == "PENDING":
+#         return jsonify({"STATUS": "processing payment"}), 202
     
-    elif task.state == "SUCCESS":
+#     elif task.state == "SUCCESS":
 
-        redis_musician_payment.setex(f"task_id:{task_id}", 3600, "verified")
-        return jsonify({"STATUS": f"payment processes, task id is:{task_id}. Don't forget to copy task_id"}), 200
+#         redis_musician_payment.setex(f"task_id:{task_id}", 3600, "verified")
+#         return jsonify({"STATUS": f"payment processes, task id is:{task_id}. Don't forget to copy task_id"}), 200
     
-    else:
-        return jsonify({"STATUS": task.state}), 400   
+#     else:
+#         return jsonify({"STATUS": task.state}), 400   
 
 
 @musician_bp.route('/add_musician', methods=['GET', 'POST'])
 def add_musician():
     data =  request.json
-    task_id = data.get('task_id')
+    # task_id = data.get('task_id')
 
-    if not task_id:
+    # if not task_id:
 
-        return jsonify({"status": "error", "message": "Task ID is required"}), 400
+    #     return jsonify({"status": "error", "message": "Task ID is required"}), 400
     
-    if redis_musician_payment.get(f"task_id:{task_id}") == "verified":
+    # if redis_musician_payment.get(f"task_id:{task_id}") == "verified":
 
-        response, status_code = insert_musician(data)
-        return jsonify (response), status_code
+    response, status_code = insert_musician(data)
+    return jsonify (response), status_code
     
-    else:
-        return jsonify ({"status": "error", "message": "Invalid Task ID. Complete payment first"}), 400
+    # else:
+    #     return jsonify ({"status": "error", "message": "Invalid Task ID. Complete payment first"}), 400
 
 
 @musician_bp.route('/authenticate_musician', methods=['POST'])
