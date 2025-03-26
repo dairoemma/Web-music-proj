@@ -64,11 +64,11 @@ def payment_processed():
 @user_bp.route('/add_user', methods=['GET', 'POST'])
 def add_user():
     data =  request.json
-    # task_id = data.get('task_id')
+    task_id = data.get('task_id')
 
-    # if not task_id:
+    if not task_id:
 
-    #     return jsonify({"status": "error", "message": "Task ID is required"}), 400
+        return jsonify({"status": "error", "message": "Task ID is required"}), 400
     
     # if redis_user_payment.get(f"task_id:{task_id}") == "verified":
 
