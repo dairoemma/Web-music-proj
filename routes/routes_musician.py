@@ -210,7 +210,7 @@ def update_music_info():
 
 
 @musician_bp.route('/delete_music', methods=['POST'])
-@jwt_required
+@jwt_required()
 def delete_musics():
     musician = get_jwt_identity()
     data = request.json
@@ -230,7 +230,7 @@ def delete_musics():
 
 
 @musician_bp.route('/add_music', methods=['POST'])
-@jwt_required
+@jwt_required()
 def add_musics():
     musician = get_jwt_identity()
     data = request.json
