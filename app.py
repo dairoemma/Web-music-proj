@@ -4,10 +4,12 @@ from helper_function.jwt_initialization import initialize_jwt
 # from helper_function.celery_file import make_celery
 from routes import blueprints
 from helper_function.socket_file import initialize_socket
+from flask_cors import CORS
 
 
 app = Flask(__name__)
 
+CORS(app)
 app.config.from_object(Config)
 
 jwt = initialize_jwt(app=app)
