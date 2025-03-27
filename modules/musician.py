@@ -88,8 +88,14 @@ def update_musician(username, musician_details):
     if username and field_to_update and field_new_value:
 
         if get_musician(username=username):
-            musicians_collection.update_one({"musician_name": username}, {"$set": {field_to_update: field_new_value}})
-            return {"status": "success", "message": "musician updated successfully"}, 200
+            if field_to_update == "password":
+               musician_password = field_new_value
+               hashed_password = generate_password_hash(musician_password)
+               musicians_collection.update_one({"musician_name": username}, {"$set": {"password": hashed_password}})
+               return {"status": "success", "message": "musician password updated successfully"}, 200
+            else:
+                musicians_collection.update_one({"musician_name": username}, {"$set": {field_to_update: field_new_value}})
+                return {"status": "success", "message": "musician updated successfully"}, 200
         else:
             return {"status": "error", "message": "musician does not exist"}, 400 
         
@@ -99,14 +105,13 @@ def update_musician(username, musician_details):
     
 def update_music(username, music_details):
     song_name = music_details['song_name']
-    songs = music_details['new_song_link']
     failed_songs = []
     is_processed = None
 
-    if username and song_name and songs:
+    if username and music_details:
 
         if get_musician(username=username):
-            result = get_file__path(songs=songs) 
+            result = get_file__path(songs=music_details) 
 
             if result['failed_song'] == None and result['processed_song'] == None:
                 return {"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}, 400
@@ -134,15 +139,13 @@ def update_music(username, music_details):
         
 
 def add_music(username, music_details):       
-    song_name = music_details['song_name']
-    songs = music_details['song_link']
     processed_songs=[]
     failed_songs = []
 
-    if username and song_name and songs:
+    if username and music_details:
 
         if get_musician(username=username):
-            result = get_file__path(songs=songs) 
+            result = get_file__path(songs=music_details) 
 
             if result['failed_song'] == None and result['processed_song'] == None:
                 return {"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}, 400

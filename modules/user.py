@@ -64,8 +64,16 @@ def update_user(username, user_details):
     if username and field_to_update and field_new_value:
 
         if get_user(username=username):
-            users_collection.update_one({"username": username}, {"$set": {field_to_update: field_new_value}})
-            return {"status": "success", "message": "user updated successfully"}, 200
+
+            if field_to_update == "password":
+                user_password = field_new_value
+                hashed_password = generate_password_hash(user_password)
+                users_collection.update_one({"musician_name": username}, {"$set": {"password": hashed_password}})
+                return {"status": "success", "message": "user password updated successfully"}, 200
+            else:
+                users_collection.update_one({"username": username}, {"$set": {field_to_update: field_new_value}})
+                return {"status": "success", "message": "user updated successfully"}, 200
+            
         else:
             return {"status": "error", "message": "Username does not exist"}, 400 
         
