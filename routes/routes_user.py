@@ -104,7 +104,11 @@ def user_profile():
 
     if user:
         user_details = get_user(user)
-        return jsonify(user_details), 200
+        if user_details:
+            user_details['_id'] = str(user_details['_id'])
+            return jsonify(user_details), 200
+        else:
+            return jsonify({"status": "error", "message": "Couldn't get details"}), 400
     else:
         return jsonify({"status": "error", "message": "Invalid credentials, Access Denied"}), 401
     
