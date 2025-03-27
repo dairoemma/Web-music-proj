@@ -14,7 +14,7 @@ def get_admin(username):
     if admin:
         return admin
     else:
-        return None
+        return {"status": "error", "message": "Admin name doesn't exist"}, 404
 
 
 def insert_admin(admin_details):
@@ -49,7 +49,7 @@ def delete_admin(username, password):
                 return {"status": "error", "message": "Incorrect username or password"}, 401
             
         else:
-            return {"status": "error", "message": "Username does not exist"}, 400    
+            return {"status": "error", "message": "Username does not exist"}, 404    
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400
@@ -72,7 +72,7 @@ def update_admin(username, admin_details):
                 return {"status": "success", "message": "admin updated successfully"}, 200
             
         else:
-            return {"status": "error", "message": "Username does not exist"}, 400 
+            return {"status": "error", "message": "Username does not exist"}, 404 
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400

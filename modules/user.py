@@ -15,7 +15,7 @@ def get_user(username):
     if user:
         return user
     else:
-        return None
+        return {"status": "error", "message": "Username doesn't exist"}, 404
 
 
 def insert_user(user_details):
@@ -51,7 +51,7 @@ def delete_user(username, password):
                 return {"status": "error", "message": "Incorrect username or password"}, 401
             
         else:
-            return {"status": "error", "message": "Username does not exist"}, 400    
+            return {"status": "error", "message": "Username does not exist"}, 404    
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400
@@ -75,7 +75,7 @@ def update_user(username, user_details):
                 return {"status": "success", "message": "user updated successfully"}, 200
             
         else:
-            return {"status": "error", "message": "Username does not exist"}, 400 
+            return {"status": "error", "message": "Username does not exist"},404 
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400

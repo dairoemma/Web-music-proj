@@ -14,7 +14,7 @@ def get_musician(username):
     if musician:
         return musician
     else:
-        return None
+        return {"status": "error", "message": "Artist name doesn't exist"}, 404
 
 
 def insert_musician(musician_details):
@@ -46,14 +46,14 @@ def delete_musician(username, password):
 
         if musician_get_detail:
             
-            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password) or musician_get_detail['password'] == password:
+            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password):
                 musicians_collection.delete_one({"musician_name": username})
                 return {"status": "success", "message": "musician deleted successfully"}, 200
             else:
                 return {"status": "error", "message": "Incorrect username or password"}, 401
             
         else:
-            return {"status": "error", "message": "musician does not exist"}, 400    
+            return {"status": "error", "message": "musician does not exist"}, 404    
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400
@@ -65,7 +65,7 @@ def delete_music(username, password, song_name):
 
         if musician_get_detail:
             
-            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password) or musician_get_detail['password'] == password:
+            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password):
                 musicians_collection.update_one({"musician_name": username},
                                                  {"$pull": {"music": {"song_name":song_name }}}
                                                  )
@@ -75,7 +75,7 @@ def delete_music(username, password, song_name):
                 return {"status": "error", "message": "Incorrect username or password"}, 401
             
         else:
-            return {"status": "error", "message": "musician does not exist"}, 400    
+            return {"status": "error", "message": "musician does not exist"}, 404    
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400
@@ -97,7 +97,7 @@ def update_musician(username, musician_details):
                 musicians_collection.update_one({"musician_name": username}, {"$set": {field_to_update: field_new_value}})
                 return {"status": "success", "message": "musician updated successfully"}, 200
         else:
-            return {"status": "error", "message": "musician does not exist"}, 400 
+            return {"status": "error", "message": "musician does not exist"}, 404 
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400
@@ -132,7 +132,7 @@ def update_music(username, music_details):
             if is_processed:
                 return {"status": "success", "message": "music updated successfully"}, 201      
         else:
-            return {"status": "error", "message": "musician does not exist"}, 400 
+            return {"status": "error", "message": "musician does not exist"}, 404 
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400
@@ -165,7 +165,7 @@ def add_music(username, music_details):
                                             )
                 return {"status": "success", "message": "musician added successfully"}, 201      
         else:
-            return {"status": "error", "message": "musician does not exist"}, 400 
+            return {"status": "error", "message": "musician does not exist"}, 404 
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400 
