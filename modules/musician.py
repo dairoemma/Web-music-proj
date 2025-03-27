@@ -46,7 +46,7 @@ def delete_musician(username, password):
 
         if musician_get_detail:
             
-            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password):
+            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password) or musician_get_detail['password'] == password:
                 musicians_collection.delete_one({"musician_name": username})
                 return {"status": "success", "message": "musician deleted successfully"}, 200
             else:
@@ -65,7 +65,7 @@ def delete_music(username, password, song_name):
 
         if musician_get_detail:
             
-            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password):
+            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password) or musician_get_detail['password'] == password:
                 musicians_collection.update_one({"musician_name": username},
                                                  {"$pull": {"music": {"song_name":song_name }}}
                                                  )
