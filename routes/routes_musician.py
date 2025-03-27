@@ -3,11 +3,11 @@ from helper_function.jwt_initialization import create_token
 from modules.musician import  get_musician, insert_musician, delete_musician, update_music, update_musician, add_music, delete_music
 from datetime import datetime
 from helper_function.celery_file import process_payment
-from helper_function.redis_config import redis_musician_payment
+# from helper_function.redis_config import redis_musician_payment
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from helper_function.utility import search_music, search_musician, search_user, get_musician_catalogue, get_all_users, get_musicians
-from helper_function.socket_file import on_connect, handle_leave_room, handle_message
+
 
 
 musician_bp = Blueprint('musician', __name__)
@@ -265,60 +265,3 @@ def delete_musician_details():
         
     else:
         return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
-
-
-@musician_bp.route('/join_musician_room', methods=['POST'])
-@jwt_required()
-def join_chat_room():
-    musician = get_jwt_identity()
-
-    if musician:
-        response = on_connect(musician, "redis_musician")
-
-        if response['status'] == "success":
-            return jsonify(response), 201
-        else:
-            return jsonify(response), 400
-        
-    else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
-
-
-@musician_bp.route('/send_message_musician', methods=['POST'])
-@jwt_required()
-def send_message():
-    musician = get_jwt_identity()
-    data = request.json
-    room = data.get('room')
-    message = data.get('message')
-
-    if musician:
-        response = handle_message(message, room, "musician")
-
-        if response['status'] == "success":
-            return jsonify(response), 200
-        else:
-            return jsonify(response), 400
-        
-    else:
-        return jsonify({"status": "error", "message": "Invalid Credentials, Access denied"}), 401
-
-
-@musician_bp.route('/leave_room_musician', methods=['POST'])
-@jwt_required()
-def delete_chat():
-    musician = get_jwt_identity()
-
-    if musician:
-        response = handle_leave_room(musician, "user")
-
-        if response['status'] == "success":
-            return jsonify(response), 200
-        
-        else:
-            return jsonify(response), 400
-        
-    else:
-        return jsonify({"status": "error", "message": "Invalid Credentials, Access denied"}), 401    
-
-

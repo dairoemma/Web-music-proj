@@ -4,10 +4,10 @@ from modules.user import get_user, insert_user, delete_user, update_user
 from helper_function.utility import search_music, search_musician, search_user, get_musician_catalogue, get_all_users, get_musicians
 from helper_function.celery_file import process_payment
 from datetime import datetime
-from helper_function.redis_config import redis_user_payment
+# from helper_function.redis_config import redis_user_payment
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from helper_function.socket_file import handle_message, handle_leave_room, on_connect
+
 
 
 user_bp = Blueprint('user', __name__)
@@ -204,58 +204,4 @@ def delete_user_details():
         
     else:
         return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
-
-
-@user_bp.route('/join_user_room', methods=['POST'])
-@jwt_required()
-def join_chat_room():
-    user = get_jwt_identity()
-
-    if user:
-        response = on_connect(user, "redis_user")
-
-        if response['status'] == "success":
-            return jsonify(response), 201
-        else:
-            return jsonify(response), 400
-        
-    else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
-
-
-@user_bp.route('/send_message_user', methods=['POST'])
-@jwt_required()
-def send_message():
-    user = get_jwt_identity()
-    data = request.json
-    room = data.get('room')
-    message = data.get('message')
-
-    if user:
-        response = handle_message(message, room, "user")
-
-        if response['status'] == "success":
-            return jsonify(response), 200
-        else:
-            return jsonify(response), 400
-        
-    else:
-        return jsonify({"status": "error", "message": "Invalid Credentials, Access denied"}), 401
-
-
-@user_bp.route('/leave_room_user', methods=['POST'])
-@jwt_required()
-def delete_chat():
-    user = get_jwt_identity()
-
-    if user:
-        response = handle_leave_room(user, "user")
-
-        if response['status'] == "success":
-            return jsonify(response), 200
-        else:
-            return jsonify(response), 400
-        
-    else:
-        return jsonify({"status": "error", "message": "Invalid Credentials, Access denied"}), 401    
 

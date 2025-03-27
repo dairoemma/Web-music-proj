@@ -1,4 +1,5 @@
 from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask import request as flask_request
 from helper_function.redis_config import redis_user, redis_admin, redis_musician
 
 
@@ -7,76 +8,81 @@ socket = None
 
 def initialize_socket(app):
     global socket
-    socket =  SocketIO(app, cors_allowed_origin="*")
+    socket = SocketIO(app, cors_allowed_origins="*")
+    register_socket_events()
     return socket
 
 
-
-def on_connect(id, redis_type):
-    if id:
-        room = join_room(id)
-        if redis_type == "redis_user":
-            redis_user.set(f"user_room{room}", room)
-            return {"status": "success", "message": f"{id} created chat room {room}"}
-        elif redis_type == "redis_musician":
-            redis_musician.set(f"muician_room{room}", room) 
-            return {"status": "success", "message": f"{id} created chat room {room}"}
-        elif redis_type == "redis_admin":
-            redis_admin.set(f"admin_room{room}", room)
-            return {"status": "success", "message": f"{id} created chat room {room}"}
-        else:
-            return {"status": "error", "message": "redis_type not found"}
-    else:
-        return {"status": "error", "message": "id missing"}
+def register_socket_events():
+    @socket.on('connect')
+    def handle_connect():
+        print(f"Client connected: {flask_request.sid}")
+        emit('connection_success', {'message': 'Connected to WebSocket'})
 
 
-def handle_message(msg, room, role):
-    if msg and room:
+    @socket.on('join_room')
+    def handle_join(data):
+        user_id = data.get("id")
+        role = data.get("role")
+
+        if not user_id or not role:
+            emit('error', {'message': 'Missing ID or role'})
+            return
+
+        join_room(user_id)
+
         if role == "user":
-            validate_user_room = redis_user.get(room)
-            if validate_user_room:
-                emit(msg, to=room)
-                return {"status": "success", "message": f"message sent"}
-            else:
-                return {"status": "error", "message": "couldn't find user chat"}
+            redis_user.set(f"user_room{user_id}", user_id)
         elif role == "musician":
-            validate_musician_room = redis_musician.get(room)
-            if validate_musician_room:
-                emit(msg, to=room)
-                return {"status": "success", "message": f"message sent"}
-            else:
-                return {"status": "error", "message": "couldn't find musician chat"}
+            redis_musician.set(f"musician_room{user_id}", user_id)
         elif role == "admin":
-            validate_admin_room = redis_admin.get(room)
-            if validate_admin_room:
-                emit(msg, to=room) 
-                return {"status": "success", "message": f"message sent"}
-            else:
-                return {"status": "error", "message": "couldn't find admin chat"}
+            redis_admin.set(f"admin_room{user_id}", user_id)
         else:
-            return {"status": "error", "message": "role doesn't exist"}
-    else:
-        return {"status": "error", "message": "couldn't send message, message and chat_room missing"}
+            emit('error', {'message': 'Invalid role'})
+            return
+
+        emit('joined_room', {'message': f"{user_id} joined room", "room": user_id}, room=user_id)
 
 
-   
-def handle_leave_room(room, role):
-    if room and role:
-      if role == "user":
+    @socket.on('send_message')
+    def handle_message(data):
+        msg = data.get("message")
+        room = data.get("room")
+        role = data.get("role")
+
+        if not msg or not room or not role:
+            emit('error', {'message': 'Message, room, or role missing'})
+            return
+
+        if role == "user" and redis_user.get(f"user_room{room}"):
+            emit('receive_message', msg, room=room)
+        elif role == "musician" and redis_musician.get(f"musician_room{room}"):
+            emit('receive_message', msg, room=room)
+        elif role == "admin" and redis_admin.get(f"admin_room{room}"):
+            emit('receive_message', msg, room=room)
+        else:
+            emit('error', {'message': 'Invalid room or role'})
+
+
+    @socket.on('leave_room')
+    def handle_leave(data):
+        room = data.get("room")
+        role = data.get("role")
+
+        if not room or not role:
+            emit('error', {'message': 'Missing room or role'})
+            return
+
         leave_room(room)
-        redis_user.delete(room)
-        return {"status": "error", "message": "successfully deleted user chat"}
-      elif role == "musician":
-        leave_room(room)
-        redis_musician.delete(room)
-        return {"status": "error", "message": "successfully deleted musician chat"}
-      elif role == "admin": 
-        leave_room(room)
-        redis_admin.delete(room)
-        return {"status": "error", "message": "successfully deleted admin chat"}
-      else:
-          return {"status": "error", "message": "role doesn't exist"}
-    else:
-        return {"status": "error", "message": "couldn't send message, room and role missing"}
-    
-      
+
+        if role == "user":
+            redis_user.delete(f"user_room{room}")
+        elif role == "musician":
+            redis_musician.delete(f"musician_room{room}")
+        elif role == "admin":
+            redis_admin.delete(f"admin_room{room}")
+        else:
+            emit('error', {'message': 'Invalid role'})
+            return
+
+        emit('left_room', {'message': f"Left room {room}"})

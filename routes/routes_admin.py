@@ -6,7 +6,7 @@ from modules.user import delete_user
 from modules.musician import delete_musician
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from helper_function.socket_file import handle_message, handle_leave_room, on_connect
+
 
 
 admin_bp = Blueprint('admin', __name__)
@@ -204,59 +204,3 @@ def delete_admin_details():
         
     else:
         return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
-
-
-@admin_bp.route('/join_admin_room', methods=['POST'])
-@jwt_required()
-def join_chat_room():
-    admin = get_jwt_identity()
-
-    if admin:
-        response = on_connect(admin, "redis_user")
-
-        if response['status'] == "success":
-            return jsonify(response), 201
-        else:
-            return jsonify(response), 400
-        
-    else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
-
-
-@admin_bp.route('/send_message_admin', methods=['POST'])
-@jwt_required()
-def send_message():
-    admin = get_jwt_identity()
-    data = request.json
-    room = data.get('room')
-    message = data.get('message')
-
-    if admin:
-        response = handle_message(message, room, "admin")
-
-        if response['status'] == "success":
-            return jsonify(response), 200
-        else:
-            return jsonify(response), 400
-        
-    else:
-        return jsonify({"status": "error", "message": "Invalid Credentials, Access denied"}), 401
-
-
-@admin_bp.route('/leave_room_admin', methods=['POST'])
-@jwt_required()
-def delete_chat():
-    admin = get_jwt_identity()
-
-    if admin:
-        response = handle_leave_room(admin, "admin")
-
-        if response['status'] == "success":
-            return jsonify(response), 200
-        else:
-            return jsonify(response), 400
-        
-    else:
-        return jsonify({"status": "error", "message": "Invalid Credentials, Access denied"}), 401    
-
-
