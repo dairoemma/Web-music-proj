@@ -30,9 +30,9 @@ def insert_user(user_details):
            return {"status": "error", "message": "Username already exist"}, 400 
         
         else: 
-             hashed_password = generate_password_hash(password)
-             users_collection.insert_one({"name": name, "username": username, "password": hashed_password, "email": email})
-             return {"status": "success", "message": "user added successfully"}, 201
+            hashed_password = generate_password_hash(password)
+            users_collection.insert_one({"name": name, "username": username, "password": hashed_password, "email": email})
+            return {"status": "success", "message": "user added successfully"}, 201
         
     else:
         return {"status": "error", "message": "All fields are required"}, 400
