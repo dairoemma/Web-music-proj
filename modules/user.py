@@ -25,15 +25,19 @@ def insert_user(user_details):
     email = user_details['email']
 
     if name and username and password and email:
-        
-        if get_user(username):
-           return {"status": "error", "message": "Username already exist"}, 400 
-        
-        else: 
+        user = get_user(username)
+        if isinstance(user, dict) and user.get("status") != "error":
+            return {"status": "error", "message": "Username already exist"}, 400
+        else:
             hashed_password = generate_password_hash(password)
-            users_collection.insert_one({"name": name, "username": username, "password": hashed_password, "email": email})
+            users_collection.insert_one({
+                "name": name,
+                "username": username,
+                "password": hashed_password,
+                "email": email
+            })
             return {"status": "success", "message": "user added successfully"}, 201
-        
+
     else:
         return {"status": "error", "message": "All fields are required"}, 400
     
