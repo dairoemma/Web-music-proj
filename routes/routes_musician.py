@@ -87,7 +87,7 @@ def authenticate_musician():
     if music_name and password:
         musician_details = get_musician(username=music_name)
 
-        if check_password_hash(musician_details['password'], password) and musician_details['password'] == password:
+        if check_password_hash(musician_details['password'], password) or musician_details['password'] == password:
             access_token = create_token(id=music_name)
             return jsonify({"status": "success", "message": "Access Granted", "access_token": access_token}), 200
         else:
