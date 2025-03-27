@@ -23,15 +23,17 @@ def insert_admin(admin_details):
     email = admin_details['email']
 
     if username and password and email:
-        
-        if get_admin(username=username):
-            return {"status": "error", "message": "Username already exist"}, 400 
-            
+        admin = get_admin(username)
+        if isinstance(admin, dict) and admin.get("status") != "error":
+            return {"status": "error", "message": "admin already exist"}, 400
         else:
             hashed_password = generate_password_hash(password)
-            admins_collection.insert_one({"username": username, "password": hashed_password, "email": email})
+            admins_collection.insert_one({
+                "username": username,
+                "password": hashed_password,
+                "email": email
+            })
             return {"status": "success", "message": "admin added successfully"}, 201
-        
     else:
         return {"status": "error", "message": "All fields are required"}, 400
     
@@ -60,8 +62,8 @@ def update_admin(username, admin_details):
     field_new_value = admin_details['field_new_value']
 
     if username and field_to_update and field_new_value:
-
-        if get_admin(username=username):
+        admin = get_admin(username)
+        if isinstance(admin, dict) and admin.get("status") != "error":
             if field_to_update == "password":
                 admin_password = field_new_value
                 hashed_password = generate_password_hash(admin_password)

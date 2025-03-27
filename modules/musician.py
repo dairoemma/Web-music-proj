@@ -24,20 +24,21 @@ def insert_musician(musician_details):
     music_genre = musician_details['music_genre'] 
     
     if username and password and email and music_genre:
-        
-        if get_musician(username=username):
-            return {"status": "error", "message": "musician-name already exist"}, 400 
-        else:  
+        musician = get_musician(username)
+        if isinstance(musician, dict) and musician.get("status") != "error":
+            return {"status": "error", "message": "Username already exist"}, 400
+        else:
             hashed_password = generate_password_hash(password)
             musicians_collection.insert_one({
             "musician_name": username, 
             "password": hashed_password, 
             "email": email, 
-            "music_genre": music_genre, 
+            "music_genre": music_genre
             })
-            return {"status": "success", "message": "musician added successfully"}, 201      
+            return {"status": "success", "message": "musician added successfully"}, 201
+
     else:
-        return {"status": "error", "message": "All fields are required"}, 400
+        return {"status": "error", "message": "All fields are required"}, 400          
     
 
 def delete_musician(username, password):
@@ -87,7 +88,8 @@ def update_musician(username, musician_details):
 
     if username and field_to_update and field_new_value:
 
-        if get_musician(username=username):
+        musician = get_musician(username)
+        if isinstance(musician, dict) and musician.get("status") != "error":
             if field_to_update == "password":
                musician_password = field_new_value
                hashed_password = generate_password_hash(musician_password)
@@ -96,6 +98,7 @@ def update_musician(username, musician_details):
             else:
                 musicians_collection.update_one({"musician_name": username}, {"$set": {field_to_update: field_new_value}})
                 return {"status": "success", "message": "musician updated successfully"}, 200
+            
         else:
             return {"status": "error", "message": "musician does not exist"}, 404 
         

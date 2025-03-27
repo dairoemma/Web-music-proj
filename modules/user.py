@@ -67,8 +67,8 @@ def update_user(username, user_details):
 
     if username and field_to_update and field_new_value:
 
-        if get_user(username=username):
-
+        user = get_user(username)
+        if isinstance(user, dict) and user.get("status") != "error":
             if field_to_update == "password":
                 user_password = field_new_value
                 hashed_password = generate_password_hash(user_password)
