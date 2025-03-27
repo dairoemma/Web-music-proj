@@ -86,13 +86,15 @@ def authenticate_musician():
 
     if music_name and password:
         musician_details = get_musician(username=music_name)
-
-        if check_password_hash(musician_details['password'], password) or musician_details['password'] == password:
-            access_token = create_token(id=music_name)
-            return jsonify({"status": "success", "message": "Access Granted", "access_token": access_token}), 200
+        if musician_details:
+            stored_password = musician_details.get('password', '')
+            if check_password_hash(musician_details['password'], password) or stored_password == password:
+                access_token = create_token(id=music_name)
+                return jsonify({"status": "success", "message": "Access Granted", "access_token": access_token}), 200
+            else:
+                return jsonify({"status": "error", "message": "Access Denied, Invalid Credentials"}), 401
         else:
-            return jsonify({"status": "error", "message": "Access Denied, Invalid Credentials"}), 401
-            
+            return jsonify({"status": "error", "message": "Musician name not found"}), 404    
     else:
         return jsonify({"status": "error", "message": "All fields are required"}), 400
     
