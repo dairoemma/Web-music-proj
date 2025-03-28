@@ -166,7 +166,7 @@ def search_a_music():
 
 @user_bp.route('/get_musician_catalogue', methods=['POST'])
 @jwt_required()
-def get_musician_catalogue():
+def get_a_musician_catalogue():
     data = request.json
     user = get_jwt_identity()
     musician_name = data.get('musician_name')
