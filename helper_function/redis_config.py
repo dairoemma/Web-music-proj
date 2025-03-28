@@ -10,6 +10,3 @@ from config import Config
 
 redis_client = redis.Redis.from_url(Config.REDIS_URL, decode_responses=True)
 
-redis_user = redis_client
-redis_admin = redis_client
-redis_musician = redis_client
