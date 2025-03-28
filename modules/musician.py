@@ -4,7 +4,12 @@ from helper_function.file_tools import get_file__path
 
 def get_all_musician():
     musicians = musicians_collection.find()
-    musician_dict = {musician["musician_name"]: musician for musician in musicians}
+    musician_dict = {}
+
+    for musician in musicians:
+        musician['_id'] = str(musician['_id'])  
+        musician_dict[musician["musician_name"]] = musician
+
     return musician_dict
 
 

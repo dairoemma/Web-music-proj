@@ -5,8 +5,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 def get_all_user():
     users = users_collection.find()
-    user_dict = {user["username"]:user for user in users}
-    return user_dict
+    users_dict = {}
+
+    for user in users:
+        user['_id'] = str(user['_id'])  
+        users_dict[user["username"]] = user
+    
+    return users_dict
 
 
 def get_user(username):

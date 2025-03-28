@@ -3,10 +3,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def get_all_admin():
-    admins = admins_collection.find()
-    admins_dict = {admin["username"]: admin for admin in admins}
-    return admins_dict
+   admins = admins_collection.find()
+   admin_dict = {}
 
+   for admin in admins:
+        admin['_id'] = str(admin['_id'])  
+        admin_dict[admin["username"]] = admin
+
+   return admin_dict
 
 def get_admin(username):
     admin = admins_collection.find_one({"username": username})
