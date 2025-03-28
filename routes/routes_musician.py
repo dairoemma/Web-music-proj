@@ -204,8 +204,7 @@ def update_music_info():
         if song_name and file:
             temp_path = f"/tmp/{file.filename}"
             file.save(temp_path)
-            response, status_code = update_music(musician, song_name, temp_path)
-            return jsonify(response), status_code
+            return update_music(musician, song_name, temp_path)
         else:
             return jsonify({"status": "error", "message": "All fields are required"}), 400
         
@@ -244,8 +243,7 @@ def add_musics():
         if song_name and file:
             temp_path = f"/tmp/{file.filename}"
             file.save(temp_path)
-            response, status_code = add_music(musician, song_name, temp_path)
-            return jsonify(response), status_code
+            return add_music(musician, song_name, temp_path)
         else:
             return jsonify({"status": "error", "message": "All fields are required"}), 400
         
