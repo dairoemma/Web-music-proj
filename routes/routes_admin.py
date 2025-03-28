@@ -69,7 +69,7 @@ def get_all_admins():
         return jsonify({"status": "error", "message": "Invalid credential, Access denied"}), 401
 
 
-@admin_bp.route('/search_user', methods=['GET'])
+@admin_bp.route('/search_user', methods=['POST'])
 @jwt_required()
 def search_a_user():
     data = request.json
@@ -89,7 +89,7 @@ def get_users():
     return jsonify(response), status_code
 
 
-@admin_bp.route('/search_musician', methods=['GET'])
+@admin_bp.route('/search_musician', methods=['POST'])
 @jwt_required()
 def search_a_musician():
     admin = get_jwt_identity()
@@ -109,7 +109,7 @@ def get_all_musicians():
     return jsonify(response), status_code
 
 
-@admin_bp.route('/search_music', methods=['GET'])
+@admin_bp.route('/search_music', methods=['POST'])
 @jwt_required()
 def search_a_music():
     data = request.json
@@ -120,7 +120,7 @@ def search_a_music():
     return jsonify(response), status_code  
 
 
-@admin_bp.route('/get_musician_catalogue', methods=['GET'])
+@admin_bp.route('/get_musician_catalogue', methods=['POST'])
 @jwt_required()
 def get_musician_catalogue():
     data = request.json
