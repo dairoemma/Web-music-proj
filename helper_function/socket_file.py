@@ -2,9 +2,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask import request as flask_request
 from helper_function.redis_config import redis_user, redis_admin, redis_musician
 
-
 socket = None
-
 
 def initialize_socket(app):
     global socket
@@ -32,11 +30,11 @@ def register_socket_events():
         join_room(user_id)
 
         if role == "user":
-            redis_user.set(f"user_room{user_id}", user_id)
+            redis_user.set(f"user_room:{user_id}", user_id)
         elif role == "musician":
-            redis_musician.set(f"musician_room{user_id}", user_id)
+            redis_musician.set(f"musician_room:{user_id}", user_id)
         elif role == "admin":
-            redis_admin.set(f"admin_room{user_id}", user_id)
+            redis_admin.set(f"admin_room:{user_id}", user_id)
         else:
             emit('error', {'message': 'Invalid role'})
             return
@@ -54,11 +52,11 @@ def register_socket_events():
             emit('error', {'message': 'Message, room, or role missing'})
             return
 
-        if role == "user" and redis_user.get(f"user_room{room}"):
+        if role == "user" and redis_user.get(f"user_room:{room}"):
             emit('receive_message', msg, room=room)
-        elif role == "musician" and redis_musician.get(f"musician_room{room}"):
+        elif role == "musician" and redis_musician.get(f"musician_room:{room}"):
             emit('receive_message', msg, room=room)
-        elif role == "admin" and redis_admin.get(f"admin_room{room}"):
+        elif role == "admin" and redis_admin.get(f"admin_room:{room}"):
             emit('receive_message', msg, room=room)
         else:
             emit('error', {'message': 'Invalid room or role'})
@@ -76,11 +74,11 @@ def register_socket_events():
         leave_room(room)
 
         if role == "user":
-            redis_user.delete(f"user_room{room}")
+            redis_user.delete(f"user_room:{room}")
         elif role == "musician":
-            redis_musician.delete(f"musician_room{room}")
+            redis_musician.delete(f"musician_room:{room}")
         elif role == "admin":
-            redis_admin.delete(f"admin_room{room}")
+            redis_admin.delete(f"admin_room:{room}")
         else:
             emit('error', {'message': 'Invalid role'})
             return
