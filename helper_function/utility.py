@@ -10,6 +10,7 @@ def search_musician(unique_name, musician_name):
             musician_details = get_musician(musician_name)
 
             if musician_details:
+                musician_details['_id'] = str(musician_details['_id'])
                 return {musician_details}, 200
             else:
                 return {"status": "error", "message": "Musician not found"}, 404
@@ -29,6 +30,7 @@ def search_user(unique_name, user_to_search):
             user_details = get_user(user_to_search)
 
             if user_details:
+                user_details['_id'] = str(user_details['_id'])
                 return {user_details}, 200
             else:
                 return {"status": "error","message": "User not found"}, 404

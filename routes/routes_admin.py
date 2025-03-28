@@ -50,6 +50,8 @@ def admin_profile():
 
     if admin:
         admin_details = get_admin(admin)
+        if admin_details:
+            admin_details['_id'] = str(admin_details['_id'])
         return jsonify(admin_details), 200
     else:
         return jsonify({"status": "error", "message": "Invalid credentials, Access Denied"}), 401

@@ -104,6 +104,8 @@ def musician_profile():
 
     if musician:
         musician_details = get_musician(musician)
+        if musician_details:
+            musician_details['_id'] = str(musician_details['_id'])
         return jsonify(musician_details), 200
     else:
         return jsonify({"status": "error", "message": "Invalid credentials, Access Denied"}), 401
