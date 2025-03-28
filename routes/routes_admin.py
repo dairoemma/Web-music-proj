@@ -132,10 +132,9 @@ def get_a_musician_catalogue():
     
 
 @admin_bp.route('/update_admin_info', methods=['PUT'])
-@jwt_required()
 def update_admin_info():
-    admin = get_jwt_identity()
     data = request.json
+    admin = data.get('admin') 
     details = data.get('details')
 
     if admin:

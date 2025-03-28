@@ -174,10 +174,9 @@ def get_a_musician_catalogue():
 
 
 @musician_bp.route('/update_musician_info', methods=['PUT'])
-@jwt_required()
 def update_musician_info():
-    musician = get_jwt_identity()
     data = request.json
+    musician = data.get('musician') 
     details = data.get('details')
 
     if musician:
