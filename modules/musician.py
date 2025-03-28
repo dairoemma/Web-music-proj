@@ -106,15 +106,14 @@ def update_musician(username, musician_details):
         return {"status": "error", "message": "All fields are required"}, 400
     
     
-def update_music(username, music_details):
-    song_name = music_details['song_name']
+def update_music(username,song_name, temp_path ):
     failed_songs = []
     is_processed = None
 
-    if username and music_details:
+    if username and song_name and temp_path:
 
         if get_musician(username=username):
-            result = get_file__path(songs=music_details) 
+            result = get_file__path(song_name, temp_path) 
 
             if result['failed_song'] == None and result['processed_song'] == None:
                 return {"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}, 400
@@ -141,14 +140,14 @@ def update_music(username, music_details):
         return {"status": "error", "message": "All fields are required"}, 400
         
 
-def add_music(username, music_details):       
+def add_music(username, song_name, temp_path):       
     processed_songs=[]
     failed_songs = []
 
-    if username and music_details:
+    if username and song_name and temp_path:
 
         if get_musician(username=username):
-            result = get_file__path(songs=music_details) 
+            result = get_file__path(song_name, temp_path) 
 
             if result['failed_song'] == None and result['processed_song'] == None:
                 return {"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}, 400
