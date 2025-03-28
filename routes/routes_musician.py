@@ -199,18 +199,24 @@ def update_music_info():
     song_name = request.form.get("song_name")
     file = request.files.get("file")
 
-    if musician:
-
-        if song_name and file:
-            temp_path = f"/tmp/{file.filename}"
-            file.save(temp_path)
-            return update_music(musician, song_name, temp_path)
-        else:
-            return jsonify({"status": "error", "message": "All fields are required"}), 400
-        
-    else:
+    if not musician:
         return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
 
+    if not song_name or not file:
+        return jsonify({"status": "error", "message": "All fields are required"}), 400
+
+    try:
+        temp_path = f"/tmp/{file.filename}"
+        file.save(temp_path)
+        result = add_music(musician, song_name, temp_path)
+
+        if result is None:
+            return jsonify({"status": "error", "message": "Unexpected failure in update_music"}), 500
+
+        return result  
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    
 
 @musician_bp.route('/delete_music', methods=['POST'])
 @jwt_required()
@@ -238,17 +244,24 @@ def add_musics():
     musician = get_jwt_identity()
     song_name = request.form.get("song_name")
     file = request.files.get("file")
-    if musician:
 
-        if song_name and file:
-            temp_path = f"/tmp/{file.filename}"
-            file.save(temp_path)
-            return add_music(musician, song_name, temp_path)
-        else:
-            return jsonify({"status": "error", "message": "All fields are required"}), 400
-        
-    else:
+    if not musician:
         return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
+
+    if not song_name or not file:
+        return jsonify({"status": "error", "message": "All fields are required"}), 400
+
+    try:
+        temp_path = f"/tmp/{file.filename}"
+        file.save(temp_path)
+        result = add_music(musician, song_name, temp_path)
+
+        if result is None:
+            return jsonify({"status": "error", "message": "Unexpected failure in add_music"}), 500
+
+        return result  
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
     
 
 @musician_bp.route('/delete_musician_details', methods=['DELETE'])
