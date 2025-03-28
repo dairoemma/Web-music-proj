@@ -244,7 +244,7 @@ def add_musics():
     musician = get_jwt_identity()
     song_name = request.form.get("song_name")
     file = request.files.get("file")
-
+    
     if not musician:
         return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
 
@@ -252,6 +252,7 @@ def add_musics():
         return jsonify({"status": "error", "message": "All fields are required"}), 400
 
     try:
+        print(f"🔥 add_music called with: {musician}, {song_name}, {temp_path}")
         temp_path = f"/tmp/{file.filename}"
         file.save(temp_path)
         result = add_music(musician, song_name, temp_path)

@@ -148,7 +148,7 @@ def add_music(username, song_name, temp_path):
 
         if get_musician(username=username):
             result = get_file__path(song_name, temp_path) 
-
+            print("📦 result from get_file__path:", result)
             if result['failed_song'] == None and result['processed_song'] == None:
                 return {"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}, 400
         
