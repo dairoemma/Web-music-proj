@@ -31,11 +31,11 @@ def get_file__path(song_name, temp_path):
                 
         if failed_song:
 
-            return { "status": "error", "message":"some songs failed to uplaod","failed_song": failed_song, "processed_song": processed_song }
+            return { "status": "error", "message":"some songs failed to uplaod","failed_song": failed_song }
             
         else:
 
-            return {"status": "success", "message": "All songs uploaded successfully", "failed_song": failed_song, "processed_song": processed_song}
+            return {"status": "success", "message": "All songs uploaded successfully", "processed_song": processed_song}
           
     else:    
         return {"status": "error", "message": "Enter song details","failed_song": None, "processed_song": None}

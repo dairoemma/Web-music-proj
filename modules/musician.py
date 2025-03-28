@@ -107,7 +107,6 @@ def update_musician(username, musician_details):
     
     
 def update_music(username,song_name, temp_path ):
-    failed_songs = []
     is_processed = None
 
     if username and song_name and temp_path:
@@ -115,24 +114,22 @@ def update_music(username,song_name, temp_path ):
         if get_musician(username=username):
             result = get_file__path(song_name, temp_path) 
 
-            if result['failed_song'] == None and result['processed_song'] == None:
+            if not result or result['processed_song'] == None:
                 return {"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}, 400
-        
-            elif result['failed_song']:
-                for failed in result['failed_song']:
-                    failed_songs.append(failed)
-                    return { "status": "error", "message": "some songs failed to upload", "failed_songs": failed_songs }, 400
 
-            elif result['failed_song'] == None and result['processed_song']:
+            elif result['processed_song']:
                 for processed in result['processed_song']:
                     musicians_collection.update_one({"musician_name": username}, 
                                             {"$set": {"music.$[elem].song_link": processed['song_link']}}, 
-                                            array_filter=[{'elem.song_name': song_name}]
+                                            array_filters=[{'elem.song_name': song_name}]
                                             )
                 is_processed  = True
                     
             if is_processed:
-                return {"status": "success", "message": "music updated successfully"}, 201      
+                return {"status": "success", "message": "music updated successfully"}, 201     
+             
+            return { "status": "error","message": result.get("message", "Upload failed"),"details": result}, 400 
+        
         else:
             return {"status": "error", "message": "musician does not exist"}, 404 
         
@@ -142,30 +139,27 @@ def update_music(username,song_name, temp_path ):
 
 def add_music(username, song_name, temp_path):       
     processed_songs=[]
-    failed_songs = []
+  
 
     if username and song_name and temp_path:
 
         if get_musician(username=username):
             result = get_file__path(song_name, temp_path) 
-            print("📦 result from get_file__path:", result)
-            if result['failed_song'] == None and result['processed_song'] == None:
-                return {"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}, 400
-        
-            elif result['failed_song']:
-                for failed in result['failed_song']:
-                    failed_songs.append(failed)
-                    return { "status": "error", "message": "some songs failed to upload", "failed_songs": failed_songs }, 400
 
-            elif result['failed_song'] == None and result['processed_song']:
+            if not result or result['processed_song'] == None:
+                return {"status": "error", "message": "Couldn't upload any song , check your file path and make sure it is correct"}, 400
+
+            elif result['processed_song']:
                 for processed in result['processed_song']:
                     processed_songs.append(processed)
                     
             if processed_songs:
                 musicians_collection.update_one({"musician_name": username}, 
-                                            {"$set": {"music": processed_songs}}
+                                            {"$push": {"music": {"$each": processed_songs}}}
                                             )
-                return {"status": "success", "message": "musician added successfully"}, 201      
+                return {"status": "success", "message": "musician added successfully"}, 201  
+             
+            return { "status": "error","message": result.get("message", "Upload failed"),"details": result}, 400   
         else:
             return {"status": "error", "message": "musician does not exist"}, 404 
         

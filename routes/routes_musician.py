@@ -204,11 +204,12 @@ def update_music_info():
 
     if not song_name or not file:
         return jsonify({"status": "error", "message": "All fields are required"}), 400
+    
+    temp_path = f"/tmp/{file.filename}"
 
     try:
-        temp_path = f"/tmp/{file.filename}"
         file.save(temp_path)
-        result = add_music(musician, song_name, temp_path)
+        result = update_music(musician, song_name, temp_path)
 
         if result is None:
             return jsonify({"status": "error", "message": "Unexpected failure in update_music"}), 500
@@ -254,19 +255,16 @@ def add_musics():
     temp_path = f"/tmp/{file.filename}"  
 
     try:
-        print(f"🎶 Upload attempt - Musician: {musician}, Song: {song_name}, Path: {temp_path}")
         file.save(temp_path) 
 
         result = add_music(musician, song_name, temp_path)
 
         if result is None:
-            print("❌ add_music returned None unexpectedly")
             return jsonify({"status": "error", "message": "Unexpected failure in add_music"}), 500
 
         return result
 
     except Exception as e:
-        print(f"🔥 ERROR in add_musics route: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
     
 
