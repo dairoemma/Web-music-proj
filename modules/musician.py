@@ -46,23 +46,17 @@ def insert_musician(musician_details):
         return {"status": "error", "message": "All fields are required"}, 400          
     
 
-def delete_musician(username, password):
-    if username and password:
-        musician_get_detail = get_musician(username=username)
+def delete_musician(username, password=None, force=False):
+    musician = get_musician(username=username)
 
-        if musician_get_detail:
-            
-            if musician_get_detail['musician_name'] == username and check_password_hash(musician_get_detail['password'], password):
-                musicians_collection.delete_one({"musician_name": username})
-                return {"status": "success", "message": "musician deleted successfully"}, 200
-            else:
-                return {"status": "error", "message": "Incorrect username or password"}, 401
-            
-        else:
-            return {"status": "error", "message": "musician does not exist"}, 404    
-        
+    if not musician:
+        return {"status": "error", "message": "Musician does not exist"}, 404
+
+    if force or (password and check_password_hash(musician['password'], password)):
+        musicians_collection.delete_one({"musician_name": username})
+        return {"status": "success", "message": "Musician deleted successfully"}, 200
     else:
-        return {"status": "error", "message": "All fields are required"}, 400
+        return {"status": "error", "message": "Incorrect password"}, 401
     
     
 def delete_music(username, password, song_name):

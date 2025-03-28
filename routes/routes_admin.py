@@ -158,14 +158,13 @@ def delete_user_details():
 
     if admin_details:
         if check_password_hash(admin_details['password'], password):
-            result = search_user(admin, user_to_delete)
-            response, status_code = delete_user(user_to_delete, result['password'])
+            response, status_code = delete_user(user_to_delete, force=True)
             return jsonify(response), status_code
         else:
-            return jsonify({"status":"error", "message": "All fields are required"}), 400
+            return jsonify({"status":"error", "message": "Invalid password"}), 401
         
     else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
+        return jsonify({"status": "error", "message": "Invalid admin, Access denied"}), 401
 
 
 @admin_bp.route('/delete_musician_details', methods=['DELETE'])
@@ -179,14 +178,13 @@ def delete_musician_details():
 
     if admin_details:
         if check_password_hash(admin_details['password'], password):
-            result = search_musician(admin, musician_to_delete)
-            response, status_code = delete_musician(musician_to_delete, result['password'])
+            response, status_code = delete_musician(musician_to_delete, force=True)
             return jsonify(response), status_code
         else:
-            return jsonify({"status":"error", "message": "All fields are required"}), 400
+            return jsonify({"status":"error", "message": "Invalid password"}), 401
         
     else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
+        return jsonify({"status": "error", "message": "Invalid admin, Access denied"}), 401
     
 
 @admin_bp.route('/delete_admin_details', methods=['DELETE'])
@@ -201,7 +199,7 @@ def delete_admin_details():
             response, status_code = delete_admin(admin, password)
             return jsonify(response), status_code
         else:
-            return jsonify({"status":"error", "message": "All fields are required"}), 400
+            return jsonify({"status":"error", "message": "Invalid password"}), 401
         
     else:
-        return jsonify({"status": "error", "message": "Invalid credentials, Access denied"}), 401
+        return jsonify({"status": "error", "message": "Invalid admin, Access denied"}), 401

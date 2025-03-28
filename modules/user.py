@@ -47,23 +47,17 @@ def insert_user(user_details):
         return {"status": "error", "message": "All fields are required"}, 400
     
 
-def delete_user(username, password):
-    if username and password:
-        user_get_detail = get_user(username=username)
+def delete_user(username, password=None, force=False):
+    user = get_user(username)
 
-        if user_get_detail:
+    if not user:
+        return {"status": "error", "message": "User does not exist"}, 404
 
-            if user_get_detail['username'] == username and check_password_hash(user_get_detail['password'], password):
-                users_collection.delete_one({"username":username})
-                return {"status": "success", "message": "user deleted successfully"}, 200
-            else:
-                return {"status": "error", "message": "Incorrect username or password"}, 401
-            
-        else:
-            return {"status": "error", "message": "Username does not exist"}, 404    
-        
+    if force or (password and check_password_hash(user['password'], password)):
+        users_collection.delete_one({"username": username})
+        return {"status": "success", "message": "User deleted successfully"}, 200
     else:
-        return {"status": "error", "message": "All fields are required"}, 400
+        return {"status": "error", "message": "Incorrect password"}, 401
     
 
 def update_user(username, user_details):
