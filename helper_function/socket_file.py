@@ -1,14 +1,13 @@
-# from flask_socketio import SocketIO, emit, join_room, leave_room
-# from flask import request as flask_request
+from flask_socketio import SocketIO #emit, join_room, leave_room
+from flask import request as flask_request
 
-# socket = None
+socket = None
 # active_users = {}
 
-# def initialize_socket(app):
-#     global socket
-#     socket = SocketIO(app, cors_allowed_origins="*")
-#     register_socket_events()
-#     return socket
+def initialize_socket(app):
+    global socket
+    socket = SocketIO(app, cors_allowed_origins="*")
+    return socket
 
 # def register_socket_events():
 #     @socket.on('connect')
