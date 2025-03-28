@@ -45,7 +45,7 @@ def search_user(unique_name, user_to_search):
 def get_all_users(unique_name):
     if unique_name:
         users_details = get_all_user()
-        return {users_details}, 200
+        return users_details, 200
     else:
         return {"status": "error", "message": "Invalid credentials, Access denied"}, 401
 
@@ -53,7 +53,7 @@ def get_all_users(unique_name):
 def get_musicians(unique_name):  
     if unique_name:
         musicians_details = get_all_musician()
-        return {musicians_details}, 200
+        return musicians_details, 200
     else:
         return {"status": "error", "message": "Invalid credentials, Access denied"}, 401
     
@@ -84,7 +84,7 @@ def get_musician_catalogue(unique_name, musician_name):
             music_details = get_music(musician_name)
 
             if music_details:
-                return {music_details}, 200
+                return music_details, 200
             else:
                 return {"status": "error", "message": "Musician not found"}, 404
             
