@@ -1,5 +1,12 @@
 from flask_socketio import SocketIO #emit, join_room, leave_room
-from flask import request as flask_request
+# from flask import request as flask_request
+
+
+# important comment
+#  we wanted to implement a chatroom using the flask_socketio for rtc but it didn't work, we used redis at first to store the rooms but redis failed
+#  we then used the username but there was no rtc, due to deadline drawing near, we couldn't delete the socket code because we used it to run the app.py and we used eventlet in our docker
+#  so the socket initialization is the only code we left uncommented because of that reason
+
 
 socket = None
 # active_users = {}

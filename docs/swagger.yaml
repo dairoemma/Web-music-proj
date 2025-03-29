@@ -1,0 +1,137 @@
+openapi: 3.0.0
+info:
+  title: FEDS Music API
+  description: Swagger API documentation for user, musician, and admin endpoints authentication endpoint.
+  version: 1.0.0
+
+servers:
+  - url: https://web-music-proj.onrender.com
+
+paths:
+  /user/add_user:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+                name:
+                  type: string
+                task_id:
+                  type: string
+              required: [username, password, email, name, task_id]
+      responses:
+        '200':
+          description: User added successfully
+
+  /user/authenticate_user:
+    post:
+      summary: Authenticate user login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required: [username, password]
+      responses:
+        '200':
+          description: User authenticated successfully
+
+  /musician/add_musician:
+    post:
+      summary: Register a new musician
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+                music_genre:
+                  type: string
+                task_id:
+                  type: string
+              required: [username, password, email, music_genre, task_id]
+      responses:
+        '200':
+          description: Musician added successfully
+
+  /musician/authenticate_musician:
+    post:
+      summary: Authenticate musician login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                music_name:
+                  type: string
+                password:
+                  type: string
+              required: [music_name, password]
+      responses:
+        '200':
+          description: Musician authenticated successfully
+
+  /admin/add_admin:
+    post:
+      summary: Register a new admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+              required: [username, password, email]
+      responses:
+        '200':
+          description: Admin added successfully
+
+  /admin/authenticate_admin:
+    post:
+      summary: Authenticate admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required: [username, password]
+      responses:
+        '200':
+          description: Admin authenticated successfully
